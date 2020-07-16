@@ -8,48 +8,59 @@
       isSubmitting: isSubmitting,
     }"
   >
-    <ul v-if="menuItemList.length > 0" class="menu-item-list">
-      <li
-        v-for="(menuItem, index) of menuItemList"
-        :key="menuItem.id"
-        class="menu-item-container"
-      >
-        <div class="menu-item">
-          <div>
-            {{ index + 1 }}. <b>{{ menuItem.label }}</b>
-          </div>
-          <em>{{ menuItem.link }}</em>
-        </div>
-        <ul v-if="menuItem.children.length > 0" class="menu-item-list">
-          <li
-            v-for="(childMenuItem, childIndex) of menuItem.children"
-            :key="childMenuItem.id"
-            class="menu-item-container"
-          >
-            <div class="menu-item">
-              <div>
-                {{ childIndex + 1 }}. <b>{{ childMenuItem.label }}</b>
-              </div>
-              <em>{{ childMenuItem.link }}</em>
-            </div>
-          </li>
-        </ul>
-      </li>
-    </ul>
-
+    <menu-item-tree
+      v-if="menuItemList.length > 0"
+      :menu-item-list="menuItemList"
+      @menu-item:edit="handleMenuItemEdit"
+      @menu-item:add-child="handleMenuItemAddChild"
+      @menu-item:remove="handleMenuItemRemove"
+    />
     <span v-else>No items found</span>
   </page>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { convertRequestErrorToMap, Nullable } from '@tager/admin-services';
 
 import { MENU_ROUTE_PATHS } from '../../constants/paths';
-import { getMenuItemList } from '../../services/requests';
+import { getMenuItemList, updateMenuItemList } from '../../services/requests';
 import { MenuItemType } from '../../typings/model';
+
+import MenuItemTree from './components/MenuItemTree.vue';
+
+function findMenuItemById(
+  itemList: Array<MenuItemType>,
+  itemId: number
+): Nullable<MenuItemType> {
+  for (const item of itemList) {
+    if (item.id === itemId) return item;
+
+    if (item.children.length > 0) {
+      const foundItem = findMenuItemById(item.children, itemId);
+      if (foundItem) return foundItem;
+    }
+  }
+
+  return null;
+}
+
+function removeMenuItemById(
+  itemList: Array<MenuItemType>,
+  itemId: number
+): Array<MenuItemType> {
+  return itemList.filter((item) => {
+    if (item.id === itemId) return false;
+
+    item.children = removeMenuItemById(item.children, itemId);
+
+    return true;
+  });
+}
 
 export default Vue.extend({
   name: 'MenuItemList',
+  components: { MenuItemTree },
   data(): {
     menuItemList: Array<MenuItemType>;
     errors: Record<string, string>;
@@ -83,59 +94,61 @@ export default Vue.extend({
       });
   },
   methods: {
+    handleMenuItemEdit(event: {
+      itemId: number;
+      payload: { label: string; link: string; isNewTab: boolean };
+    }) {
+      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+
+      if (foundItem) {
+        foundItem.label = event.payload.label;
+        foundItem.link = event.payload.link;
+        foundItem.isNewTab = event.payload.isNewTab;
+      }
+    },
+    handleMenuItemAddChild(event: { itemId: number }) {
+      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+
+      if (foundItem) {
+        foundItem.children.push({
+          id: Math.round(Math.random() * 1000000),
+          label: '',
+          link: '',
+          isNewTab: false,
+          children: [],
+        });
+      }
+    },
+    handleMenuItemRemove(event: { itemId: number }) {
+      this.menuItemList = removeMenuItemById(this.menuItemList, event.itemId);
+    },
     submitForm() {
       this.isSubmitting = true;
 
-      // updateSettingsItem(this.itemId, body)
-      //   .then(() => {
-      //     this.errors = {};
-      //     this.$router.push(MENU_ROUTE_PATHS.MENU_LIST);
-      //
-      //     this.$toast({
-      //       variant: 'success',
-      //       title: 'Success',
-      //       body: 'Settings have been successfully updated',
-      //     });
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //     this.errors = convertRequestErrorToMap(error);
-      //     this.$toast({
-      //       variant: 'danger',
-      //       title: 'Error',
-      //       body: 'Settings update have been failed',
-      //     });
-      //   })
-      //   .finally(() => {
-      //     this.isSubmitting = false;
-      //   });
+      updateMenuItemList(this.menuAlias, this.menuItemList)
+        .then(() => {
+          this.errors = {};
+          this.$router.push(MENU_ROUTE_PATHS.MENU_LIST);
+
+          this.$toast({
+            variant: 'success',
+            title: 'Success',
+            body: 'Settings have been successfully updated',
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          this.errors = convertRequestErrorToMap(error);
+          this.$toast({
+            variant: 'danger',
+            title: 'Error',
+            body: 'Settings update have been failed',
+          });
+        })
+        .finally(() => {
+          this.isSubmitting = false;
+        });
     },
   },
 });
 </script>
-
-<style scoped lang="scss">
-.menu-item-list {
-}
-
-.menu-item {
-  width: 400px;
-
-  background-color: #eee;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 1rem;
-
-  &:not(:last-child) {
-    margin-bottom: 0.7rem;
-  }
-}
-
-.menu-item-container {
-  margin-bottom: 0.7rem;
-
-  .menu-item-list {
-    padding-left: 3rem;
-  }
-}
-</style>
