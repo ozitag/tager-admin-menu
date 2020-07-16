@@ -8,7 +8,7 @@
       isSubmitting: isSubmitting,
     }"
   >
-    <ul class="menu-item-list">
+    <ul v-if="menuItemList.length > 0" class="menu-item-list">
       <li
         v-for="(menuItem, index) of menuItemList"
         :key="menuItem.id"
@@ -36,6 +36,8 @@
         </ul>
       </li>
     </ul>
+
+    <span v-else>No items found</span>
   </page>
 </template>
 
