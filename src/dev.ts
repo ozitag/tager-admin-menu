@@ -7,7 +7,7 @@ import '@tager/admin-ui/dist/admin-ui.css';
 
 import {
   MENU_LIST_ROUTE,
-  MENU_ITEMS_FORM_ROUTE,
+  MENU_ITEMS_ROUTE,
   MENU_FORM_ROUTE,
 } from './constants/routes';
 import config from './config/config.json';
@@ -20,7 +20,7 @@ Vue.use(AdminLayoutPlugin);
 
 const router = createRouter(
   {
-    routes: [MENU_LIST_ROUTE, MENU_FORM_ROUTE, MENU_ITEMS_FORM_ROUTE],
+    routes: [MENU_LIST_ROUTE, MENU_FORM_ROUTE, MENU_ITEMS_ROUTE],
   },
   { useTitleSync: false }
 );
