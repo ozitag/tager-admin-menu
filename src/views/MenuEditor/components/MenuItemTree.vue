@@ -2,7 +2,7 @@
 import Vue, { VNode } from 'vue';
 
 import MenuItem from './MenuItem.vue';
-import { EditableMenuItemType } from '../MenuItemList.types';
+import { EditableMenuItemType } from '../MenuEditor.types';
 
 export default Vue.extend({
   name: 'MenuItemTree',

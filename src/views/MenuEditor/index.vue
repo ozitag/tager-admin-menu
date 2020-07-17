@@ -1,9 +1,8 @@
 <template>
   <page
-    :title="'Menu items'"
+    title="Menu items"
     :is-content-loading="isInitialLoading"
     :footer="{
-      backHref: menuListRoutePath,
       onSubmit: submitForm,
       isSubmitting: isSubmitting,
     }"
@@ -38,7 +37,7 @@ import { MENU_ROUTE_PATHS } from '../../constants/paths';
 import { getMenuItemList, updateMenuItemList } from '../../services/requests';
 
 import MenuItemTree from './components/MenuItemTree.vue';
-import { EditableMenuItemType } from './MenuItemList.types';
+import { EditableMenuItemType } from './MenuEditor.types';
 import {
   convertToEditableMenuItems,
   findArrayContainingMenuItemWithId,
@@ -46,10 +45,10 @@ import {
   getItemCount,
   moveMenuItemById,
   removeMenuItemById,
-} from './MenuItemList.helpers';
+} from './MenuEditor.helpers';
 
 export default Vue.extend({
-  name: 'MenuItemList',
+  name: 'MenuEditor',
   components: { MenuItemTree },
   data(): {
     menuItemList: Array<EditableMenuItemType>;
@@ -74,19 +73,34 @@ export default Vue.extend({
       return getItemCount(this.menuItemList);
     },
   },
+  watch: {
+    menuAlias() {
+      this.refreshMenuItemList();
+    },
+  },
   mounted(): void {
-    this.isInitialLoading = true;
-
-    getMenuItemList(this.menuAlias)
-      .then((response) => {
-        this.menuItemList = convertToEditableMenuItems(response.data);
-      })
-      .catch(console.error)
-      .finally(() => {
-        this.isInitialLoading = false;
-      });
+    this.refreshMenuItemList();
   },
   methods: {
+    refreshMenuItemList() {
+      this.isInitialLoading = true;
+
+      getMenuItemList(this.menuAlias)
+        .then((response) => {
+          this.menuItemList = convertToEditableMenuItems(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+          this.$toast({
+            variant: 'danger',
+            title: 'Error',
+            body: 'Menu items fetching has been failed',
+          });
+        })
+        .finally(() => {
+          this.isInitialLoading = false;
+        });
+    },
     handleMenuItemEdit(event: {
       itemId: number;
       payload: { label: string; link: string; isNewTab: boolean };
@@ -151,7 +165,7 @@ export default Vue.extend({
       updateMenuItemList(this.menuAlias, this.menuItemList)
         .then(() => {
           this.errors = {};
-          this.$router.push(MENU_ROUTE_PATHS.MENU_LIST);
+          this.$router.push('/');
 
           this.$toast({
             variant: 'success',

@@ -2,7 +2,7 @@ import { Nullable } from '@tager/admin-services';
 
 import { MenuItemType } from '../../typings/model';
 
-import { EditableMenuItemType } from './MenuItemList.types';
+import { EditableMenuItemType } from './MenuEditor.types';
 
 export function getItemCount(itemList: Array<EditableMenuItemType>): number {
   let sum = 0;

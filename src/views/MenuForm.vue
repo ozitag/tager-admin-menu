@@ -3,7 +3,6 @@
     title="Menu form"
     :is-content-loading="isInitialLoading"
     :footer="{
-      backHref: menuListRoutePath,
       onSubmit: submitForm,
       isSubmitting: isSubmitting,
     }"

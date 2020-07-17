@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { EditableMenuItemType } from '../MenuItemList.types';
+import { EditableMenuItemType } from '../MenuEditor.types';
 import { Nullable } from '@tager/admin-services';
 
 export default Vue.extend({
