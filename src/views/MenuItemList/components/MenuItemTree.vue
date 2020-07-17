@@ -1,8 +1,8 @@
 <script lang="ts">
 import Vue, { VNode } from 'vue';
-import { MenuItemType } from '../../../typings/model';
 
 import MenuItem from './MenuItem.vue';
+import { EditableMenuItemType } from '../MenuItemList.types';
 
 export default Vue.extend({
   name: 'MenuItemTree',
@@ -14,25 +14,39 @@ export default Vue.extend({
     },
   },
   render(createElement, context) {
-    const menuItemList = context.props.menuItemList as Array<MenuItemType>;
+    const menuItemList = context.props.menuItemList as Array<
+      EditableMenuItemType
+    >;
 
-    function renderList(itemList: Array<MenuItemType>): VNode {
+    function renderList(
+      itemList: Array<EditableMenuItemType>,
+      indexPath: Array<number>
+    ): VNode {
       return createElement(
         'ul',
         { class: 'menu-item-list' },
         itemList.map((menuItem, index) => {
+          const itemIndexPath = [...indexPath, index];
+
           return createElement('li', { class: 'menu-item-container' }, [
             createElement(MenuItem, {
-              props: { menuItem, index, itemList },
+              props: {
+                menuItem,
+                index,
+                itemList,
+                indexPath: itemIndexPath,
+              },
               on: context.listeners,
             }),
-            menuItem.children.length > 0 ? renderList(menuItem.children) : null,
+            menuItem.children.length > 0
+              ? renderList(menuItem.children, itemIndexPath)
+              : null,
           ]);
         })
       );
     }
 
-    return renderList(menuItemList);
+    return renderList(menuItemList, []);
   },
 });
 </script>

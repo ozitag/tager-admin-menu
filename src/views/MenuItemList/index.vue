@@ -8,61 +8,51 @@
       isSubmitting: isSubmitting,
     }"
   >
+    <div class="top-row">
+      <base-button variant="outline-primary" @click="addMenuItemToRootStart">
+        Add menu item
+      </base-button>
+    </div>
     <menu-item-tree
       v-if="menuItemList.length > 0"
       :menu-item-list="menuItemList"
+      @menu-item:update-status="handleMenuItemStatusUpdate"
       @menu-item:edit="handleMenuItemEdit"
-      @menu-item:add-child="handleMenuItemAddChild"
+      @menu-item:add-child="handleAddChildToMenuItemWithId"
       @menu-item:remove="handleMenuItemRemove"
+      @menu-item:move="handleMenuItemMove"
     />
-    <span v-else>No items found</span>
+    <div v-if="itemCount >= 5" class="bottom-row">
+      <base-button variant="outline-primary" @click="addMenuItemToRootEnd">
+        Add menu item
+      </base-button>
+    </div>
   </page>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { convertRequestErrorToMap, Nullable } from '@tager/admin-services';
+import { convertRequestErrorToMap } from '@tager/admin-services';
 
 import { MENU_ROUTE_PATHS } from '../../constants/paths';
 import { getMenuItemList, updateMenuItemList } from '../../services/requests';
-import { MenuItemType } from '../../typings/model';
 
 import MenuItemTree from './components/MenuItemTree.vue';
-
-function findMenuItemById(
-  itemList: Array<MenuItemType>,
-  itemId: number
-): Nullable<MenuItemType> {
-  for (const item of itemList) {
-    if (item.id === itemId) return item;
-
-    if (item.children.length > 0) {
-      const foundItem = findMenuItemById(item.children, itemId);
-      if (foundItem) return foundItem;
-    }
-  }
-
-  return null;
-}
-
-function removeMenuItemById(
-  itemList: Array<MenuItemType>,
-  itemId: number
-): Array<MenuItemType> {
-  return itemList.filter((item) => {
-    if (item.id === itemId) return false;
-
-    item.children = removeMenuItemById(item.children, itemId);
-
-    return true;
-  });
-}
+import { EditableMenuItemType } from './MenuItemList.types';
+import {
+  convertToEditableMenuItems,
+  findArrayContainingMenuItemWithId,
+  findMenuItemById,
+  getItemCount,
+  moveMenuItemById,
+  removeMenuItemById,
+} from './MenuItemList.helpers';
 
 export default Vue.extend({
   name: 'MenuItemList',
   components: { MenuItemTree },
   data(): {
-    menuItemList: Array<MenuItemType>;
+    menuItemList: Array<EditableMenuItemType>;
     errors: Record<string, string>;
     isSubmitting: boolean;
     isInitialLoading: boolean;
@@ -80,13 +70,16 @@ export default Vue.extend({
     menuAlias(): string {
       return this.$route.params.menuAlias;
     },
+    itemCount(): number {
+      return getItemCount(this.menuItemList);
+    },
   },
   mounted(): void {
     this.isInitialLoading = true;
 
     getMenuItemList(this.menuAlias)
       .then((response) => {
-        this.menuItemList = response.data;
+        this.menuItemList = convertToEditableMenuItems(response.data);
       })
       .catch(console.error)
       .finally(() => {
@@ -106,21 +99,51 @@ export default Vue.extend({
         foundItem.isNewTab = event.payload.isNewTab;
       }
     },
-    handleMenuItemAddChild(event: { itemId: number }) {
+    handleMenuItemStatusUpdate(event: {
+      itemId: number;
+      payload: { status: EditableMenuItemType['status'] };
+    }) {
       const foundItem = findMenuItemById(this.menuItemList, event.itemId);
 
       if (foundItem) {
-        foundItem.children.push({
-          id: Math.round(Math.random() * 1000000),
-          label: '',
-          link: '',
-          isNewTab: false,
-          children: [],
-        });
+        foundItem.status = event.payload.status;
       }
+    },
+    createNewMenuItem(): EditableMenuItemType {
+      return {
+        id: Math.round(Math.random() * 1000000),
+        label: '',
+        link: '',
+        isNewTab: false,
+        status: 'EDITING',
+        children: [],
+      };
+    },
+    handleAddChildToMenuItemWithId(event: { itemId: number }) {
+      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+
+      if (foundItem) {
+        foundItem.children.unshift(this.createNewMenuItem());
+      }
+    },
+    addMenuItemToRootStart() {
+      this.menuItemList.unshift(this.createNewMenuItem());
+    },
+    addMenuItemToRootEnd() {
+      this.menuItemList.push(this.createNewMenuItem());
     },
     handleMenuItemRemove(event: { itemId: number }) {
       this.menuItemList = removeMenuItemById(this.menuItemList, event.itemId);
+    },
+    handleMenuItemMove(event: { itemId: number; direction: 'up' | 'down' }) {
+      const childList = findArrayContainingMenuItemWithId(
+        this.menuItemList,
+        event.itemId
+      );
+
+      if (!childList) return;
+
+      moveMenuItemById(childList, event.itemId, event.direction);
     },
     submitForm() {
       this.isSubmitting = true;
@@ -152,3 +175,12 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.top-row {
+  margin-bottom: 1rem;
+}
+.bottom-row {
+  margin-top: 1rem;
+}
+</style>

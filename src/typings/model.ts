@@ -1,4 +1,4 @@
-import { Nullable, FileType } from '@tager/admin-services';
+import { Nullable } from '@tager/admin-services';
 
 export type MenuType = {
   id: number;
@@ -6,10 +6,10 @@ export type MenuType = {
   label: string;
 };
 
-export type MenuItemType = {
+export interface MenuItemType {
   id: number;
   label: string;
   link: Nullable<string>;
   isNewTab: boolean;
   children: Array<MenuItemType>;
-};
+}
