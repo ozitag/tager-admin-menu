@@ -8,12 +8,12 @@
 import Vue from 'vue';
 import { MenuItemType } from '@tager/admin-layout';
 
-import { MENU_ROUTE_PATHS } from '../constants/paths';
+import { getMenuListUrl } from '../utils/paths';
 
 export const MENU_SECTION_MENU_ITEM: MenuItemType = {
   id: 'menu',
   name: 'Menu',
-  path: MENU_ROUTE_PATHS.MENU_LIST,
+  path: getMenuListUrl(),
   icon: 'settings',
 };
 

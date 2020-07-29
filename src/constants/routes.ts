@@ -5,6 +5,7 @@ import MenuItemList from '../views/MenuEditor/index.vue';
 import MenuForm from '../views/MenuForm.vue';
 
 import { MENU_ROUTE_PATHS } from './paths';
+import { getMenuListUrl } from '../utils/paths';
 
 const HOME_BREADCRUMB = { path: '/', label: 'Home' };
 
@@ -28,7 +29,7 @@ export const MENU_FORM_ROUTE: CustomRouteConfig = {
     getBreadcrumbs: (route) => [
       HOME_BREADCRUMB,
       {
-        path: MENU_ROUTE_PATHS.MENU_LIST,
+        path: getMenuListUrl(),
         label: MENU_LIST_ROUTE.name,
       },
       { path: route.path, label: route.name },
@@ -44,7 +45,7 @@ export const MENU_ITEMS_ROUTE: CustomRouteConfig = {
     getBreadcrumbs: (route) => [
       HOME_BREADCRUMB,
       {
-        path: MENU_ROUTE_PATHS.MENU_LIST,
+        path: getMenuListUrl(),
         label: MENU_LIST_ROUTE.name,
       },
       { path: route.path, label: route.name },

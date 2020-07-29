@@ -33,7 +33,7 @@
 import Vue from 'vue';
 import { convertRequestErrorToMap } from '@tager/admin-services';
 
-import { MENU_ROUTE_PATHS } from '../../constants/paths';
+import { getMenuListUrl } from '../../utils/paths';
 import { getMenuItemList, updateMenuItemList } from '../../services/requests';
 
 import MenuItemTree from './components/MenuItemTree.vue';
@@ -62,7 +62,7 @@ export default Vue.extend({
       errors: {},
       isSubmitting: false,
       isInitialLoading: false,
-      menuListRoutePath: MENU_ROUTE_PATHS.MENU_LIST,
+      menuListRoutePath: getMenuListUrl(),
     };
   },
   computed: {

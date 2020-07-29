@@ -34,7 +34,7 @@ import {
   MenuUpdatePayload,
   updateMenu,
 } from '../services/requests';
-import { MENU_ROUTE_PATHS } from '../constants/paths';
+import { getMenuListUrl } from '../utils/paths';
 import { MenuType } from '../typings/model';
 
 type FormValues = MenuUpdatePayload;
@@ -53,7 +53,7 @@ export default Vue.extend({
       errors: {},
       isSubmitting: false,
       isInitialLoading: false,
-      menuListRoutePath: MENU_ROUTE_PATHS.MENU_LIST,
+      menuListRoutePath: getMenuListUrl(),
     };
   },
   computed: {
@@ -95,7 +95,7 @@ export default Vue.extend({
       requestPromise
         .then(() => {
           this.errors = {};
-          this.$router.push(MENU_ROUTE_PATHS.MENU_LIST);
+          this.$router.push(getMenuListUrl());
 
           this.$toast({
             variant: 'success',

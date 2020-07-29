@@ -3,13 +3,13 @@ import { request, ResponseBody } from '@tager/admin-services';
 import { MenuItemType, MenuType } from '../typings/model';
 
 export function getMenuList(): Promise<ResponseBody<Array<MenuType>>> {
-  return request.get({ path: '/menus' });
+  return request.get({ path: '/admin/menus' });
 }
 
 export function getMenu(
   menuId: number | string
 ): Promise<ResponseBody<MenuType>> {
-  return request.get({ path: `/menus/${menuId}` });
+  return request.get({ path: `/admin/menus/${menuId}` });
 }
 
 export type MenuUpdatePayload = Pick<MenuType, 'alias' | 'label'>;
@@ -17,26 +17,26 @@ export type MenuUpdatePayload = Pick<MenuType, 'alias' | 'label'>;
 export function createMenu(
   payload: MenuUpdatePayload
 ): Promise<ResponseBody<MenuType>> {
-  return request.post({ path: '/menus', body: payload });
+  return request.post({ path: '/admin/menus', body: payload });
 }
 
 export function updateMenu(
   menuId: number | string,
   payload: MenuUpdatePayload
 ): Promise<ResponseBody<MenuType>> {
-  return request.put({ path: `/menus/${menuId}`, body: payload });
+  return request.put({ path: `/admin/menus/${menuId}`, body: payload });
 }
 
 export function deleteMenu(
   menuId: number | string
 ): Promise<{ success: boolean }> {
-  return request.delete({ path: `/menus/${menuId}` });
+  return request.delete({ path: `/admin/menus/${menuId}` });
 }
 
 export function getMenuItemList(
   menuAlias: string
 ): Promise<ResponseBody<Array<MenuItemType>>> {
-  return request.get({ path: `/menus/${menuAlias}/items` });
+  return request.get({ path: `/admin/menus/${menuAlias}/items` });
 }
 
 export function updateMenuItemList(
@@ -44,7 +44,7 @@ export function updateMenuItemList(
   menuItemList: Array<MenuItemType>
 ): Promise<ResponseBody<Array<MenuItemType>>> {
   return request.put({
-    path: `/menus/${menuAlias}/items`,
+    path: `/admin/menus/${menuAlias}/items`,
     body: { items: menuItemList },
   });
 }

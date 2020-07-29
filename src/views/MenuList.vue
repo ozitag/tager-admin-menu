@@ -44,13 +44,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { compile } from 'path-to-regexp';
 import { ColumnDefinition } from '@tager/admin-ui';
 import { getMessageFromError, Nullable } from '@tager/admin-services';
 
 import { MenuType } from '../typings/model';
 import { deleteMenu, getMenuList } from '../services/requests';
-import { MENU_ROUTE_PATHS } from '../constants/paths';
+import { getMenuFormUrl, getMenuItemsUrl } from '../utils/paths';
 
 const COLUMN_DEFS: Array<ColumnDefinition<MenuType>> = [
   { id: 2, name: 'Alias', field: 'alias' },
@@ -108,10 +107,10 @@ export default Vue.extend({
         });
     },
     getMenuHref(menuId: string): string {
-      return compile(MENU_ROUTE_PATHS.MENU_FORM)({ menuId });
+      return getMenuFormUrl({ menuId });
     },
     getMenuItemsHref(menuAlias: string): string {
-      return compile(MENU_ROUTE_PATHS.MENU_ITEMS)({ menuAlias });
+      return getMenuItemsUrl({ menuAlias });
     },
     deleteMenu(menu: MenuType) {
       const shouldDelete = confirm(
