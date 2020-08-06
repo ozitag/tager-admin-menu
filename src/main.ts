@@ -21,8 +21,8 @@ export function createMenuRoute(
     component: MenuEditor,
     meta: {
       getBreadcrumbs: (route) => [
-        { path: '/', label: 'Home' },
-        { path: route.path, label: route.name },
+        { url: '/', text: 'Home' },
+        { url: route.path, text: name },
       ],
     },
     ...overrides,

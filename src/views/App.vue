@@ -12,8 +12,8 @@ import { getMenuListUrl } from '../utils/paths';
 
 export const MENU_SECTION_MENU_ITEM: MenuItemType = {
   id: 'menu',
-  name: 'Menu',
-  path: getMenuListUrl(),
+  text: 'Menu',
+  url: getMenuListUrl(),
   icon: 'settings',
 };
 

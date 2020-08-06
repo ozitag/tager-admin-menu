@@ -7,7 +7,7 @@ import MenuForm from '../views/MenuForm.vue';
 import { MENU_ROUTE_PATHS } from './paths';
 import { getMenuListUrl } from '../utils/paths';
 
-const HOME_BREADCRUMB = { path: '/', label: 'Home' };
+const HOME_BREADCRUMB = { url: '/', text: 'Home' };
 
 export const MENU_LIST_ROUTE: CustomRouteConfig = {
   path: MENU_ROUTE_PATHS.MENU_LIST,
@@ -16,7 +16,7 @@ export const MENU_LIST_ROUTE: CustomRouteConfig = {
   meta: {
     getBreadcrumbs: (route) => [
       HOME_BREADCRUMB,
-      { path: route.path, label: route.name },
+      { url: route.path, text: route.name ?? '' },
     ],
   },
 };
@@ -29,10 +29,10 @@ export const MENU_FORM_ROUTE: CustomRouteConfig = {
     getBreadcrumbs: (route) => [
       HOME_BREADCRUMB,
       {
-        path: getMenuListUrl(),
-        label: MENU_LIST_ROUTE.name,
+        url: getMenuListUrl(),
+        text: MENU_LIST_ROUTE.name ?? '',
       },
-      { path: route.path, label: route.name },
+      { url: route.path, text: route.name ?? '' },
     ],
   },
 };
@@ -45,10 +45,10 @@ export const MENU_ITEMS_ROUTE: CustomRouteConfig = {
     getBreadcrumbs: (route) => [
       HOME_BREADCRUMB,
       {
-        path: getMenuListUrl(),
-        label: MENU_LIST_ROUTE.name,
+        url: getMenuListUrl(),
+        text: MENU_LIST_ROUTE.name ?? '',
       },
-      { path: route.path, label: route.name },
+      { url: route.path, text: route.name ?? '' },
     ],
   },
 };
