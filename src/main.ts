@@ -1,6 +1,8 @@
-import MenuEditorView from './views/MenuEditor/index.vue';
-import { CustomRouteConfig } from '@tager/admin-layout';
 import { VueConstructor } from 'vue';
+import { CustomRouteConfig } from '@tager/admin-layout';
+
+import MenuEditorView from './views/MenuEditor/index.vue';
+import { MENU_ROUTE_PATHS } from './constants/paths';
 
 export * from './constants/routes';
 export * from './constants/paths';
@@ -17,7 +19,7 @@ export function createMenuRoute(
 ): CustomRouteConfig {
   return {
     name,
-    path: '/menu/:menuAlias',
+    path: MENU_ROUTE_PATHS.MENU_PAGE,
     component: MenuEditor,
     meta: {
       getBreadcrumbs: (route) => [

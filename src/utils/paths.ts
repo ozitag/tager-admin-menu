@@ -13,3 +13,7 @@ export function getMenuFormUrl(params: { menuId: string }): string {
 export function getMenuItemsUrl(params: { menuAlias: string }): string {
   return compile(MENU_ROUTE_PATHS.MENU_ITEMS)(params);
 }
+
+export function getMenuPageUrl(params: { menuAlias: string }): string {
+  return compile(MENU_ROUTE_PATHS.MENU_PAGE)(params);
+}

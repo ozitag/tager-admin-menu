@@ -1,7 +1,7 @@
 import { CustomRouteConfig } from '@tager/admin-layout';
 
 import MenuList from '../views/MenuList.vue';
-import MenuItemList from '../views/MenuEditor/index.vue';
+import MenuEditor from '../views/MenuEditor/index.vue';
 import MenuForm from '../views/MenuForm.vue';
 
 import { MENU_ROUTE_PATHS } from './paths';
@@ -39,7 +39,7 @@ export const MENU_FORM_ROUTE: CustomRouteConfig = {
 
 export const MENU_ITEMS_ROUTE: CustomRouteConfig = {
   path: MENU_ROUTE_PATHS.MENU_ITEMS,
-  component: MenuItemList,
+  component: MenuEditor,
   name: 'Menu items',
   meta: {
     getBreadcrumbs: (route) => [
