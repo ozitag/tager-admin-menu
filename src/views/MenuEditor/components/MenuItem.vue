@@ -136,7 +136,7 @@ export default Vue.extend({
   },
   computed: {
     isEditing(): boolean {
-      return this.menuItem.status === 'EDITING';
+      return ['EDITING', 'EDITING_NEW'].includes(this.menuItem.status);
     },
     labelPrefix(): string {
       return (this.indexPath as Array<number>)
@@ -193,8 +193,12 @@ export default Vue.extend({
       this.updateMenuItemStatus('EDITING');
     },
     cancelEditing() {
-      this.itemDraft = this.getInitialDraft();
-      this.updateMenuItemStatus('IDLE');
+      if (this.menuItem.status === 'EDITING_NEW') {
+        this.removeMenuItem();
+      } else {
+        this.itemDraft = this.getInitialDraft();
+        this.updateMenuItemStatus('IDLE');
+      }
     },
     submitEditing() {
       this.$emit('menu-item:edit', {

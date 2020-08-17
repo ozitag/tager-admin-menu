@@ -49,14 +49,19 @@ export function findArrayContainingMenuItemWithId(
 export function removeMenuItemById(
   itemList: Array<EditableMenuItemType>,
   itemId: number
-): Array<EditableMenuItemType> {
-  return itemList.filter((item) => {
-    if (item.id === itemId) return false;
+): void {
+  for (let i = 0; i < itemList.length; i++) {
+    const currentItem = itemList[i];
 
-    item.children = removeMenuItemById(item.children, itemId);
+    if (currentItem.id === itemId) {
+      itemList.splice(i, 1);
+      return;
+    }
 
-    return true;
-  });
+    if (currentItem.children.length > 0) {
+      removeMenuItemById(currentItem.children, itemId);
+    }
+  }
 }
 
 export function moveMenuItemById(

@@ -12,6 +12,12 @@ export function getMenu(
   return request.get({ path: `/admin/menus/${menuId}` });
 }
 
+export function getMenuByAlias(
+  menuAlias: string
+): Promise<ResponseBody<MenuType>> {
+  return request.get({ path: `/admin/menus/${menuAlias}` });
+}
+
 export type MenuUpdatePayload = Pick<MenuType, 'alias' | 'label'>;
 
 export function createMenu(

@@ -1,6 +1,6 @@
 <template>
   <page
-    title="Menu items"
+    :title="pageTitle"
     :is-content-loading="isInitialLoading"
     :footer="{
       onSubmit: submitForm,
@@ -30,11 +30,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { convertRequestErrorToMap } from '@tager/admin-services';
+import { convertRequestErrorToMap, Nullable } from '@tager/admin-services';
 
 import { getMenuListUrl } from '../../utils/paths';
-import { getMenuItemList, updateMenuItemList } from '../../services/requests';
+import {
+  getMenuByAlias,
+  getMenuItemList,
+  updateMenuItemList,
+} from '../../services/requests';
 
 import MenuItemTree from './components/MenuItemTree.vue';
 import { EditableMenuItemType } from './MenuEditor.types';
@@ -46,128 +49,146 @@ import {
   moveMenuItemById,
   removeMenuItemById,
 } from './MenuEditor.helpers';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  watch,
+} from '@vue/composition-api';
+import { MenuItemType, MenuType } from '../../typings/model';
+import useResource from '../../hooks/useResource';
 
-export default Vue.extend({
+export default defineComponent({
   name: 'MenuEditor',
   components: { MenuItemTree },
-  data(): {
-    menuItemList: Array<EditableMenuItemType>;
-    errors: Record<string, string>;
-    isSubmitting: boolean;
-    isInitialLoading: boolean;
-    menuListRoutePath: string;
-  } {
-    return {
-      menuItemList: [],
-      errors: {},
-      isSubmitting: false,
-      isInitialLoading: false,
-      menuListRoutePath: getMenuListUrl(),
-    };
-  },
-  computed: {
-    menuAlias(): string {
-      return this.$route.params.menuAlias;
-    },
-    itemCount(): number {
-      return getItemCount(this.menuItemList);
-    },
-  },
-  watch: {
-    menuAlias() {
-      this.refreshMenuItemList();
-    },
-  },
-  mounted(): void {
-    this.refreshMenuItemList();
-  },
-  methods: {
-    refreshMenuItemList() {
-      this.isInitialLoading = true;
+  setup(props, context) {
+    const menuAlias = computed<string>(
+      () => context.root.$route.params.menuAlias
+    );
 
-      getMenuItemList(this.menuAlias)
-        .then((response) => {
-          this.menuItemList = convertToEditableMenuItems(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-          this.$toast({
-            variant: 'danger',
-            title: 'Error',
-            body: 'Menu items fetching has been failed',
-          });
-        })
-        .finally(() => {
-          this.isInitialLoading = false;
-        });
-    },
-    handleMenuItemEdit(event: {
+    const [fetchMenu, { data: menu }] = useResource<Nullable<MenuType>>({
+      fetchResource: () => getMenuByAlias(menuAlias.value),
+      initialValue: null,
+      context,
+      resourceName: 'Menu',
+    });
+
+    const pageTitle = computed<string>(() =>
+      menu.value ? `${menu.value.label} - Menu Items` : 'Menu Items'
+    );
+
+    const [
+      fetchMenuItemList,
+      { data: originalMenuItemList, loading },
+    ] = useResource<Array<MenuItemType>>({
+      fetchResource: () => getMenuItemList(menuAlias.value),
+      initialValue: [],
+      context,
+      resourceName: 'Menu items',
+    });
+
+    onMounted(() => {
+      fetchMenuItemList();
+      fetchMenu();
+    });
+
+    const menuItemList = ref<Array<EditableMenuItemType>>([]);
+
+    watch(originalMenuItemList, () => {
+      menuItemList.value = convertToEditableMenuItems(
+        originalMenuItemList.value
+      );
+    });
+
+    watch(menuAlias, () => {
+      fetchMenuItemList();
+      fetchMenu();
+    });
+
+    const itemCount = computed<number>(() => getItemCount(menuItemList.value));
+
+    function handleMenuItemEdit(event: {
       itemId: number;
       payload: { label: string; link: string; isNewTab: boolean };
     }) {
-      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+      const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
       if (foundItem) {
         foundItem.label = event.payload.label;
         foundItem.link = event.payload.link;
         foundItem.isNewTab = event.payload.isNewTab;
       }
-    },
-    handleMenuItemStatusUpdate(event: {
+    }
+
+    function handleMenuItemStatusUpdate(event: {
       itemId: number;
       payload: { status: EditableMenuItemType['status'] };
     }) {
-      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+      const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
       if (foundItem) {
         foundItem.status = event.payload.status;
       }
-    },
-    createNewMenuItem(): EditableMenuItemType {
+    }
+
+    function createNewMenuItem(): EditableMenuItemType {
       return {
         id: Math.round(Math.random() * 1000000),
         label: '',
         link: '',
         isNewTab: false,
-        status: 'EDITING',
+        status: 'EDITING_NEW',
         children: [],
       };
-    },
-    handleAddChildToMenuItemWithId(event: { itemId: number }) {
-      const foundItem = findMenuItemById(this.menuItemList, event.itemId);
+    }
+
+    function handleAddChildToMenuItemWithId(event: { itemId: number }) {
+      const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
       if (foundItem) {
-        foundItem.children.unshift(this.createNewMenuItem());
+        foundItem.children.unshift(createNewMenuItem());
       }
-    },
-    addMenuItemToRootStart() {
-      this.menuItemList.unshift(this.createNewMenuItem());
-    },
-    addMenuItemToRootEnd() {
-      this.menuItemList.push(this.createNewMenuItem());
-    },
-    handleMenuItemRemove(event: { itemId: number }) {
-      this.menuItemList = removeMenuItemById(this.menuItemList, event.itemId);
-    },
-    handleMenuItemMove(event: { itemId: number; direction: 'up' | 'down' }) {
+    }
+
+    function addMenuItemToRootStart() {
+      menuItemList.value.unshift(createNewMenuItem());
+    }
+
+    function addMenuItemToRootEnd() {
+      menuItemList.value.push(createNewMenuItem());
+    }
+
+    function handleMenuItemRemove(event: { itemId: number }) {
+      removeMenuItemById(menuItemList.value, event.itemId);
+    }
+
+    function handleMenuItemMove(event: {
+      itemId: number;
+      direction: 'up' | 'down';
+    }) {
       const childList = findArrayContainingMenuItemWithId(
-        this.menuItemList,
+        menuItemList.value,
         event.itemId
       );
 
       if (!childList) return;
 
       moveMenuItemById(childList, event.itemId, event.direction);
-    },
-    submitForm() {
-      this.isSubmitting = true;
+    }
 
-      updateMenuItemList(this.menuAlias, this.menuItemList)
+    const isSubmitting = ref<boolean>(false);
+    const errors = ref<Record<string, string>>({});
+
+    function submitForm() {
+      isSubmitting.value = true;
+
+      updateMenuItemList(menuAlias.value, menuItemList.value)
         .then(() => {
-          this.errors = {};
-          this.$router.push('/');
+          errors.value = {};
+          context.root.$router.push('/');
 
-          this.$toast({
+          context.root.$toast({
             variant: 'success',
             title: 'Success',
             body: 'Settings have been successfully updated',
@@ -175,17 +196,35 @@ export default Vue.extend({
         })
         .catch((error) => {
           console.error(error);
-          this.errors = convertRequestErrorToMap(error);
-          this.$toast({
+          errors.value = convertRequestErrorToMap(error);
+          context.root.$toast({
             variant: 'danger',
             title: 'Error',
             body: 'Settings update have been failed',
           });
         })
         .finally(() => {
-          this.isSubmitting = false;
+          isSubmitting.value = false;
         });
-    },
+    }
+
+    return {
+      menuItemList,
+      errors: {},
+      isSubmitting: false,
+      isInitialLoading: loading,
+      menuListRoutePath: getMenuListUrl(),
+      itemCount,
+      pageTitle,
+      handleAddChildToMenuItemWithId,
+      addMenuItemToRootStart,
+      addMenuItemToRootEnd,
+      handleMenuItemRemove,
+      handleMenuItemMove,
+      handleMenuItemEdit,
+      handleMenuItemStatusUpdate,
+      submitForm,
+    };
   },
 });
 </script>

@@ -28,20 +28,24 @@ export default Vue.extend({
         itemList.map((menuItem, index) => {
           const itemIndexPath = [...indexPath, index];
 
-          return createElement('li', { class: 'menu-item-container' }, [
-            createElement(MenuItem, {
-              props: {
-                menuItem,
-                index,
-                itemList,
-                indexPath: itemIndexPath,
-              },
-              on: context.listeners,
-            }),
-            menuItem.children.length > 0
-              ? renderList(menuItem.children, itemIndexPath)
-              : null,
-          ]);
+          return createElement(
+            'li',
+            { class: 'menu-item-container', key: menuItem.id },
+            [
+              createElement(MenuItem, {
+                props: {
+                  menuItem,
+                  index,
+                  itemList,
+                  indexPath: itemIndexPath,
+                },
+                on: context.listeners,
+              }),
+              menuItem.children.length > 0
+                ? renderList(menuItem.children, itemIndexPath)
+                : null,
+            ]
+          );
         })
       );
     }
