@@ -7,7 +7,7 @@
       isSubmitting: isSubmitting,
     }"
   >
-    <div class="top-row">
+    <div v-if="itemCount >= 5" class="top-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootStart">
         Add menu item
       </base-button>
@@ -21,7 +21,7 @@
       @menu-item:remove="handleMenuItemRemove"
       @menu-item:move="handleMenuItemMove"
     />
-    <div v-if="itemCount >= 5" class="bottom-row">
+    <div class="bottom-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootEnd">
         Add menu item
       </base-button>
