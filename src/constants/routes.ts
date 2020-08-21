@@ -1,7 +1,7 @@
 import { CustomRouteConfig } from '@tager/admin-layout';
 
 import MenuList from '../views/MenuList.vue';
-import MenuEditor from '../views/MenuEditor/index.vue';
+import MenuEditor from '../views/MenuEditor';
 import MenuForm from '../views/MenuForm.vue';
 
 import { MENU_ROUTE_PATHS } from './paths';

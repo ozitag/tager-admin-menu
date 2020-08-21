@@ -1,7 +1,7 @@
 import { VueConstructor } from 'vue';
 import { CustomRouteConfig } from '@tager/admin-layout';
 
-import MenuEditorView from './views/MenuEditor/index.vue';
+import MenuEditorView from './views/MenuEditor';
 import { MENU_ROUTE_PATHS } from './constants/paths';
 
 export * from './constants/routes';

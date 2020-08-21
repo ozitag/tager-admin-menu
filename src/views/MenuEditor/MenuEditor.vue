@@ -30,7 +30,11 @@
 </template>
 
 <script lang="ts">
-import { convertRequestErrorToMap, Nullable } from '@tager/admin-services';
+import {
+  convertRequestErrorToMap,
+  Nullable,
+  useResource,
+} from '@tager/admin-services';
 
 import { getMenuListUrl } from '../../utils/paths';
 import {
@@ -57,7 +61,6 @@ import {
   watch,
 } from '@vue/composition-api';
 import { MenuItemType, MenuType } from '../../typings/model';
-import useResource from '../../hooks/useResource';
 
 export default defineComponent({
   name: 'MenuEditor',
