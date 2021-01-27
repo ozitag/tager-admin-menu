@@ -214,7 +214,7 @@ export default defineComponent({
     return {
       menuItemList,
       errors: {},
-      isSubmitting: false,
+      isSubmitting,
       isInitialLoading: loading,
       menuListRoutePath: getMenuListUrl(),
       itemCount,
