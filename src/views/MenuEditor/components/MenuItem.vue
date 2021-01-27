@@ -5,10 +5,10 @@
         <div>
           {{ labelPrefix }} <b>{{ menuItem.label }}</b>
         </div>
-        <em>{{ menuItem.link }}</em>
+        <em class="link">{{ menuItem.link }}</em>
       </div>
 
-      <div>
+      <div class="right">
         <base-button
           v-if="!isEditing"
           variant="icon"
@@ -231,6 +231,12 @@ export default Vue.extend({
     margin-bottom: 0.7rem;
   }
 
+  .link {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .inner {
     display: flex;
     justify-content: space-between;
@@ -240,6 +246,13 @@ export default Vue.extend({
       display: flex;
       flex-direction: column;
       justify-content: center;
+      overflow: hidden;
+    }
+
+    .right {
+      display: flex;
+      align-items: flex-start;
+      margin-left: 1rem;
     }
   }
 
