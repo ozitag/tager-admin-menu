@@ -235,6 +235,7 @@ export default Vue.extend({
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 0 1px;
   }
 
   .inner {
