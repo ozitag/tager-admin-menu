@@ -183,13 +183,16 @@ export default defineComponent({
     const isSubmitting = ref<boolean>(false);
     const errors = ref<Record<string, string>>({});
 
-    function submitForm() {
+    function submitForm({ shouldExit }: { shouldExit: boolean }) {
       isSubmitting.value = true;
 
       updateMenuItemList(menuAlias.value, menuItemList.value)
         .then(() => {
           errors.value = {};
-          context.root.$router.push('/');
+
+          if (shouldExit) {
+            context.root.$router.push('/');
+          }
 
           context.root.$toast({
             variant: 'success',
