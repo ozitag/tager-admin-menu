@@ -85,7 +85,7 @@ export default Vue.extend({
         alias: menu.alias,
       };
     },
-    submitForm() {
+    submitForm({ shouldExit }: { shouldExit: boolean }) {
       this.isSubmitting = true;
 
       const requestPromise = this.isCreation
@@ -95,7 +95,10 @@ export default Vue.extend({
       requestPromise
         .then(() => {
           this.errors = {};
-          this.$router.push(getMenuListUrl());
+
+          if (shouldExit) {
+            this.$router.push(getMenuListUrl());
+          }
 
           this.$toast({
             variant: 'success',
