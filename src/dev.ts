@@ -13,6 +13,8 @@ import {
 } from './constants/routes';
 import config from './config/config.json';
 import App from './views/App.vue';
+import EN from './locales/en';
+import RU from './locales/ru';
 
 configStore.setConfig(config);
 
@@ -28,7 +30,10 @@ const router = createRouter(
 
 Vue.use(VueCompositionApi);
 
-i18n.init().then(() => {
+i18n.addTranslations('en', 'menus', EN);
+i18n.addTranslations('ru', 'menus', RU);
+
+i18n.init({ debug: false }).then(() => {
   const app = createApp({
     router,
     render: (h: CreateElement) => h(App),

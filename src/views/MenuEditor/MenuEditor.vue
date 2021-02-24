@@ -9,7 +9,7 @@
   >
     <div v-if="itemCount >= 5" class="top-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootStart">
-        Add menu item
+        {{ t('menus:addMenuItem') }}
       </base-button>
     </div>
     <menu-item-tree
@@ -23,7 +23,7 @@
     />
     <div class="bottom-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootEnd">
-        Add menu item
+        {{ t('menus:addMenuItem') }}
       </base-button>
     </div>
   </page>
@@ -58,14 +58,18 @@ import {
   defineComponent,
   onMounted,
   ref,
+  SetupContext,
   watch,
 } from '@vue/composition-api';
 import { MenuItemType, MenuType } from '../../typings/model';
+import { useTranslation } from '@tager/admin-ui';
 
 export default defineComponent({
   name: 'MenuEditor',
   components: { MenuItemTree },
-  setup(props, context) {
+  setup(props, context: SetupContext) {
+    const { t } = useTranslation(context);
+
     const menuAlias = computed<string>(
       () => context.root.$route.params.menuAlias
     );
@@ -78,7 +82,9 @@ export default defineComponent({
     });
 
     const pageTitle = computed<string>(() =>
-      menu.value ? `${menu.value.label} - Menu Items` : 'Menu Items'
+      menu.value
+        ? `${menu.value.label} - ${t('menus:menuItems')}`
+        : t('menus:menuItems')
     );
 
     const [
@@ -196,8 +202,8 @@ export default defineComponent({
 
           context.root.$toast({
             variant: 'success',
-            title: 'Success',
-            body: 'Settings have been successfully updated',
+            title: t('menus:success'),
+            body: t('menus:settingsHaveBeenSuccessfullyUpdated'),
           });
         })
         .catch((error) => {
@@ -205,8 +211,8 @@ export default defineComponent({
           errors.value = convertRequestErrorToMap(error);
           context.root.$toast({
             variant: 'danger',
-            title: 'Error',
-            body: 'Settings update have been failed',
+            title: t('menus:error'),
+            body: t('menus:settingsUpdateHaveBeenFailed'),
           });
         })
         .finally(() => {
@@ -215,6 +221,7 @@ export default defineComponent({
     }
 
     return {
+      t,
       menuItemList,
       errors: {},
       isSubmitting,

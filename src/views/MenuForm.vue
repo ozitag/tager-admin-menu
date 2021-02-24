@@ -1,6 +1,6 @@
 <template>
   <page
-    title="Menu form"
+    :title="$t('menus:menuForm')"
     :is-content-loading="isInitialLoading"
     :footer="{
       onSubmit: submitForm,
@@ -11,13 +11,13 @@
       <form-field
         v-model="values.alias"
         name="alias"
-        label="Alias"
+        :label="$t('menus:alias')"
         :error="errors.alias"
       />
       <form-field
         v-model="values.label"
         name="label"
-        label="Label"
+        :label="$t('menus:label')"
         :error="errors.label"
       />
     </form>
@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from '@vue/composition-api';
 import { convertRequestErrorToMap } from '@tager/admin-services';
 
 import {
@@ -39,7 +39,7 @@ import { MenuType } from '../typings/model';
 
 type FormValues = MenuUpdatePayload;
 
-export default Vue.extend({
+export default defineComponent({
   name: 'MenuForm',
   data(): {
     values: FormValues;

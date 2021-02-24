@@ -1,5 +1,5 @@
 <template>
-  <page title="Menus">
+  <page :title="t('menus:menus')">
     <base-table
       :column-defs="columnDefs"
       :row-data="rowData"
@@ -11,7 +11,7 @@
           variant="outline-secondary"
           :href="getMenuItemsUrl({ menuAlias: row.alias })"
         >
-          Menu Items
+          {{ t('menus:menuItems') }}
         </base-button>
       </template>
     </base-table>
@@ -19,29 +19,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from '@vue/composition-api';
-import { ColumnDefinition } from '@tager/admin-ui';
+import { defineComponent, onMounted, SetupContext } from '@vue/composition-api';
+import { ColumnDefinition, useTranslation } from '@tager/admin-ui';
 import { useResource } from '@tager/admin-services';
 
 import { MenuType } from '../typings/model';
 import { getMenuList } from '../services/requests';
 import { getMenuItemsUrl } from '../utils/paths';
 
-const COLUMN_DEFS: Array<ColumnDefinition<MenuType>> = [
-  { id: 2, name: 'Alias', field: 'alias' },
-  { id: 3, name: 'Label', field: 'label' },
-  {
-    id: 4,
-    name: '',
-    field: 'menuElements',
-    style: { width: '170px', textAlign: 'center', whiteSpace: 'nowrap' },
-    headStyle: { width: '170px' },
-  },
-];
-
 export default defineComponent({
   name: 'MenuList',
-  setup(props, context) {
+  setup(props, context: SetupContext) {
+    const { t } = useTranslation(context);
+
     const [
       fetchMenuList,
       { data: menuList, loading: isMenuListLoading, error },
@@ -56,8 +46,21 @@ export default defineComponent({
       fetchMenuList();
     });
 
+    const columnDefs: Array<ColumnDefinition<MenuType>> = [
+      { id: 2, name: t('menus:alias'), field: 'alias' },
+      { id: 3, name: t('menus:label'), field: 'label' },
+      {
+        id: 4,
+        name: '',
+        field: 'menuElements',
+        style: { width: '170px', textAlign: 'center', whiteSpace: 'nowrap' },
+        headStyle: { width: '170px' },
+      },
+    ];
+
     return {
-      columnDefs: COLUMN_DEFS,
+      t,
+      columnDefs,
       rowData: menuList,
       isRowDataLoading: isMenuListLoading,
       errorMessage: error,
