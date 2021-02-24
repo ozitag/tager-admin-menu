@@ -7,16 +7,14 @@ import MenuForm from '../views/MenuForm.vue';
 import { MENU_ROUTE_PATHS } from './paths';
 import { getMenuListUrl } from '../utils/paths';
 
-const HOME_BREADCRUMB = { url: '/', text: 'Home' };
-
 export const MENU_LIST_ROUTE: CustomRouteConfig = {
   path: MENU_ROUTE_PATHS.MENU_LIST,
   component: MenuList,
   name: 'Menus',
   meta: {
-    getBreadcrumbs: (route) => [
-      HOME_BREADCRUMB,
-      { url: route.path, text: route.name ?? '' },
+    getBreadcrumbs: (route, t) => [
+      { url: '/', text: t('menus:home') },
+      { url: route.path, text: t('menus:menus') },
     ],
   },
 };
@@ -26,13 +24,13 @@ export const MENU_FORM_ROUTE: CustomRouteConfig = {
   component: MenuForm,
   name: 'Menu form',
   meta: {
-    getBreadcrumbs: (route) => [
-      HOME_BREADCRUMB,
+    getBreadcrumbs: (route, t) => [
+      { url: '/', text: t('menus:home') },
       {
         url: getMenuListUrl(),
-        text: MENU_LIST_ROUTE.name ?? '',
+        text: t('menus:menus'),
       },
-      { url: route.path, text: route.name ?? '' },
+      { url: route.path, text: t('menus:menuForm') },
     ],
   },
 };
@@ -42,13 +40,13 @@ export const MENU_ITEMS_ROUTE: CustomRouteConfig = {
   component: MenuEditor,
   name: 'Menu items',
   meta: {
-    getBreadcrumbs: (route) => [
-      HOME_BREADCRUMB,
+    getBreadcrumbs: (route, t) => [
+      { url: '/', text: t('menus:home') },
       {
         url: getMenuListUrl(),
-        text: MENU_LIST_ROUTE.name ?? '',
+        text: t('menus:menus'),
       },
-      { url: route.path, text: route.name ?? '' },
+      { url: route.path, text: t('menus:menuItems') },
     ],
   },
 };

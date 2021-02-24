@@ -5,23 +5,29 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from '@vue/composition-api';
 import { MenuItemType } from '@tager/admin-layout';
 
 import { getMenuListUrl } from '../utils/paths';
+import { useTranslation } from '@tager/admin-ui';
 
-export const MENU_SECTION_MENU_ITEM: MenuItemType = {
-  id: 'menu',
-  text: 'Menu',
-  url: getMenuListUrl(),
-  icon: 'settings',
-};
-
-export default Vue.extend({
+export default defineComponent({
   name: 'App',
-  data(): { sidebarMenuList: Array<MenuItemType> } {
+  setup(props, context) {
+    const { t } = useTranslation(context);
+
+    const sidebarMenuList: Array<MenuItemType> = [
+      {
+        id: 'menu',
+        text: t('menus:menu'),
+        url: getMenuListUrl(),
+        icon: 'settings',
+      },
+    ];
+
     return {
-      sidebarMenuList: [MENU_SECTION_MENU_ITEM],
+      t,
+      sidebarMenuList,
     };
   },
 });

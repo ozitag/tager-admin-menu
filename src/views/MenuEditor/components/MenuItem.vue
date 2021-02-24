@@ -12,7 +12,7 @@
         <base-button
           v-if="!isEditing"
           variant="icon"
-          title="Edit"
+          :title="$t('menus:edit')"
           @click="startEditing"
         >
           <svg-icon name="edit" />
@@ -21,7 +21,7 @@
         <base-button
           v-if="!isEditing"
           variant="icon"
-          title="Add child item"
+          :title="$t('menus:addChildItem')"
           @click="addChild"
         >
           <svg-icon name="addCircle" />
@@ -30,7 +30,7 @@
         <base-button
           v-if="!isEditing"
           variant="icon"
-          title="Move up"
+          :title="$t('menus:moveUp')"
           :disabled="index === 0"
           @click="moveMenuItem('up')"
         >
@@ -40,14 +40,18 @@
         <base-button
           v-if="!isEditing"
           variant="icon"
-          title="Move down"
+          :title="$t('menus:moveDown')"
           :disabled="index === itemList.length - 1"
           @click="moveMenuItem('down')"
         >
           <svg-icon name="south" />
         </base-button>
 
-        <base-button variant="icon" title="Delete" @click="removeMenuItem">
+        <base-button
+          variant="icon"
+          :title="$t('menus:delete')"
+          @click="removeMenuItem"
+        >
           <svg-icon name="delete" />
         </base-button>
       </div>
@@ -64,34 +68,38 @@
           :id="menuItem.id + '_label'"
           v-model="itemDraft.label"
           :name="menuItem.id + '_label'"
-          label="Name"
+          :label="$t('menus:name')"
           autofocus
         />
         <form-field
           :id="menuItem.id + '_link'"
           v-model="itemDraft.link"
           :name="menuItem.id + '_link'"
-          label="Link"
+          :label="$t('menus:link')"
         />
         <form-field-checkbox
           :id="menuItem.id + '_isNewTab'"
           v-model="itemDraft.isNewTab"
           :name="menuItem.id + '_isNewTab'"
-          label="Is new tab?"
+          :label="$t('menus:isNewTab')"
         />
       </fieldset>
 
       <div class="form-bottom">
         <base-button
           variant="secondary"
-          title="Cancel changes"
+          :title="$t('menus:cancelChanges')"
           @click="cancelEditing"
         >
-          Cancel
+          {{ $t('menus:cancel') }}
         </base-button>
 
-        <base-button variant="primary" type="submit" title="Save changes">
-          Save
+        <base-button
+          variant="primary"
+          type="submit"
+          :title="$t('menus:saveChanges')"
+        >
+          {{ $t('menus:save') }}
         </base-button>
       </div>
     </form>
