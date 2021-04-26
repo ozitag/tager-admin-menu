@@ -9,14 +9,17 @@ export default Vue.extend({
   functional: true,
   props: {
     menuItemList: {
-      type: Array,
+      type: Array as () => Array<EditableMenuItemType>,
       required: true,
+    },
+    isSupportsTree: {
+      type: Boolean,
+      default: false,
     },
   },
   render(createElement, context) {
-    const menuItemList = context.props.menuItemList as Array<
-      EditableMenuItemType
-    >;
+    const menuItemList = context.props.menuItemList;
+    const isSupportsTree = context.props.isSupportsTree;
 
     function renderList(
       itemList: Array<EditableMenuItemType>,
@@ -38,6 +41,7 @@ export default Vue.extend({
                   index,
                   itemList,
                   indexPath: itemIndexPath,
+                  isSupportsTree,
                 },
                 on: context.listeners,
               }),
