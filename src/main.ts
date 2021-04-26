@@ -14,9 +14,6 @@ export * from './constants/routes';
 export * from './constants/paths';
 export * from './utils/paths';
 
-export { default as MenuList } from './views/MenuList.vue';
-export { default as MenuForm } from './views/MenuForm.vue';
-
 export const MenuEditor: VueConstructor<Vue> = MenuEditorView;
 
 export function createMenuRoute(

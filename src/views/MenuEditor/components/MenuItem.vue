@@ -19,7 +19,7 @@
         </base-button>
 
         <base-button
-          v-if="!isEditing"
+          v-if="isSupportsTree && !isEditing"
           variant="icon"
           :title="$t('menus:addChildItem')"
           @click="addChild"
@@ -129,6 +129,10 @@ export default Vue.extend({
     itemList: {
       type: Array,
       required: true,
+    },
+    isSupportsTree: {
+      type: Boolean,
+      default: false,
     },
   },
   data(): {

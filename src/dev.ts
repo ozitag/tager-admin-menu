@@ -6,11 +6,7 @@ import { AdminLayoutPlugin, createRouter } from '@tager/admin-layout';
 
 import '@tager/admin-ui/dist/admin-ui.css';
 
-import {
-  MENU_LIST_ROUTE,
-  MENU_ITEMS_ROUTE,
-  MENU_FORM_ROUTE,
-} from './constants/routes';
+import { MENU_PAGE_ROUTE } from './constants/routes';
 import config from './config/config.json';
 import App from './views/App.vue';
 import EN from './locales/en';
@@ -23,7 +19,7 @@ Vue.use(AdminLayoutPlugin);
 
 const router = createRouter(
   {
-    routes: [MENU_LIST_ROUTE, MENU_FORM_ROUTE, MENU_ITEMS_ROUTE],
+    routes: [MENU_PAGE_ROUTE],
   },
   { useTitleSync: false }
 );
@@ -33,7 +29,7 @@ Vue.use(VueCompositionApi);
 i18n.addTranslations('en', 'menus', EN);
 i18n.addTranslations('ru', 'menus', RU);
 
-i18n.init({ debug: false }).then(() => {
+i18n.init({ debug: false, lng: 'ru' }).then(() => {
   const app = createApp({
     router,
     render: (h: CreateElement) => h(App),

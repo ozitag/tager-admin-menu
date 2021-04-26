@@ -9,12 +9,13 @@
   >
     <div v-if="itemCount >= 5" class="top-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootStart">
-        {{ t('menus:addMenuItem') }}
+        {{ $t('menus:addMenuItem') }}
       </base-button>
     </div>
     <menu-item-tree
       v-if="menuItemList.length > 0"
       :menu-item-list="menuItemList"
+      :is-supports-tree="isSupportsTree"
       @menu-item:update-status="handleMenuItemStatusUpdate"
       @menu-item:edit="handleMenuItemEdit"
       @menu-item:add-child="handleAddChildToMenuItemWithId"
@@ -23,7 +24,7 @@
     />
     <div class="bottom-row">
       <base-button variant="outline-primary" @click="addMenuItemToRootEnd">
-        {{ t('menus:addMenuItem') }}
+        {{ $t('menus:addMenuItem') }}
       </base-button>
     </div>
   </page>
@@ -36,12 +37,7 @@ import {
   useResource,
 } from '@tager/admin-services';
 
-import { getMenuListUrl } from '../../utils/paths';
-import {
-  getMenuByAlias,
-  getMenuItemList,
-  updateMenuItemList,
-} from '../../services/requests';
+import { getMenuByAlias, updateMenuItemList } from '../../services/requests';
 
 import MenuItemTree from './components/MenuItemTree.vue';
 import { EditableMenuItemType } from './MenuEditor.types';
@@ -61,7 +57,7 @@ import {
   SetupContext,
   watch,
 } from '@vue/composition-api';
-import { MenuItemType, MenuType } from '../../typings/model';
+import { MenuType } from '../../typings/model';
 import { useTranslation } from '@tager/admin-ui';
 
 export default defineComponent({
@@ -74,7 +70,9 @@ export default defineComponent({
       () => context.root.$route.params.menuAlias
     );
 
-    const [fetchMenu, { data: menu }] = useResource<Nullable<MenuType>>({
+    const [fetchMenu, { data: menu, loading }] = useResource<
+      Nullable<MenuType>
+    >({
       fetchResource: () => getMenuByAlias(menuAlias.value),
       initialValue: null,
       context,
@@ -83,35 +81,22 @@ export default defineComponent({
 
     const pageTitle = computed<string>(() =>
       menu.value
-        ? `${menu.value.label} - ${t('menus:menuItems')}`
+        ? `${menu.value.name} - ${t('menus:menuItems')}`
         : t('menus:menuItems')
     );
 
-    const [
-      fetchMenuItemList,
-      { data: originalMenuItemList, loading },
-    ] = useResource<Array<MenuItemType>>({
-      fetchResource: () => getMenuItemList(menuAlias.value),
-      initialValue: [],
-      context,
-      resourceName: 'Menu items',
-    });
-
     onMounted(() => {
-      fetchMenuItemList();
       fetchMenu();
     });
 
+    const isSupportsTree = computed(() => menu.value?.supportsTree);
     const menuItemList = ref<Array<EditableMenuItemType>>([]);
 
-    watch(originalMenuItemList, () => {
-      menuItemList.value = convertToEditableMenuItems(
-        originalMenuItemList.value
-      );
+    watch(menu, () => {
+      menuItemList.value = convertToEditableMenuItems(menu.value?.items ?? []);
     });
 
     watch(menuAlias, () => {
-      fetchMenuItemList();
       fetchMenu();
     });
 
@@ -226,7 +211,7 @@ export default defineComponent({
       errors: {},
       isSubmitting,
       isInitialLoading: loading,
-      menuListRoutePath: getMenuListUrl(),
+      isSupportsTree,
       itemCount,
       pageTitle,
       handleAddChildToMenuItemWithId,

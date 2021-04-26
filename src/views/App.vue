@@ -8,8 +8,8 @@
 import { defineComponent } from '@vue/composition-api';
 import { MenuItemType } from '@tager/admin-layout';
 
-import { getMenuListUrl } from '../utils/paths';
 import { useTranslation } from '@tager/admin-ui';
+import { getMenuPageUrl } from '../utils/paths';
 
 export default defineComponent({
   name: 'App',
@@ -20,13 +20,25 @@ export default defineComponent({
       {
         id: 'menu',
         text: t('menus:menu'),
-        url: getMenuListUrl(),
         icon: 'settings',
+        children: [
+          {
+            text: t('menus:headerMenu'),
+            url: getMenuPageUrl({ menuAlias: 'header' }),
+          },
+          {
+            text: t('menus:mainMenu'),
+            url: getMenuPageUrl({ menuAlias: 'main' }),
+          },
+          {
+            text: t('menus:footerMenu'),
+            url: getMenuPageUrl({ menuAlias: 'footer' }),
+          },
+        ],
       },
     ];
 
     return {
-      t,
       sidebarMenuList,
     };
   },

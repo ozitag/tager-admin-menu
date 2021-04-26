@@ -24,6 +24,9 @@ const EN = {
   home: 'Home',
   cancel: 'Cancel',
   save: 'Save',
+  headerMenu: 'Top Menu',
+  mainMenu: 'Main menu',
+  footerMenu: 'Lower menu',
 };
 
 export default EN;

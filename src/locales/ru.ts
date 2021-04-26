@@ -25,6 +25,9 @@ const RU: typeof EN = {
   home: 'Главная',
   cancel: 'Отмена',
   save: 'Сохранить',
+  headerMenu: 'Верхнее меню',
+  mainMenu: 'Главное меню',
+  footerMenu: 'Нижнее меню',
 };
 
 export default RU;

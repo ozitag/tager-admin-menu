@@ -1,10 +1,11 @@
 import { Nullable } from '@tager/admin-services';
 
-export type MenuType = {
-  id: number;
-  alias: string;
-  label: string;
-};
+export interface MenuType {
+  readonly alias: string;
+  readonly items: Array<MenuItemType>;
+  readonly name: string;
+  readonly supportsTree: boolean;
+}
 
 export interface MenuItemType {
   id: number;
