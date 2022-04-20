@@ -1,1 +1,1 @@
-export { default } from './MenuEditor.vue';
+export { default } from "./MenuEditor.vue";

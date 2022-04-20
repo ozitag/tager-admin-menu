@@ -9,51 +9,51 @@
       </div>
 
       <div class="right">
-        <base-button
+        <BaseButton
           v-if="!isEditing"
           variant="icon"
-          :title="$t('menus:edit')"
+          :title="$i18n.t('menus:edit')"
           @click="startEditing"
         >
-          <svg-icon name="edit" />
-        </base-button>
+          <EditIcon />
+        </BaseButton>
 
-        <base-button
+        <BaseButton
           v-if="isSupportsTree && !isEditing"
           variant="icon"
-          :title="$t('menus:addChildItem')"
+          :title="$i18n.t('menus:addChildItem')"
           @click="addChild"
         >
-          <svg-icon name="addCircle" />
-        </base-button>
+          <AddCircleIcon />
+        </BaseButton>
 
-        <base-button
+        <BaseButton
           v-if="!isEditing"
           variant="icon"
-          :title="$t('menus:moveUp')"
+          :title="$i18n.t('menus:moveUp')"
           :disabled="index === 0"
           @click="moveMenuItem('up')"
         >
-          <svg-icon name="north" />
-        </base-button>
+          <NorthIcon />
+        </BaseButton>
 
-        <base-button
+        <BaseButton
           v-if="!isEditing"
           variant="icon"
-          :title="$t('menus:moveDown')"
+          :title="$i18n.t('menus:moveDown')"
           :disabled="index === itemList.length - 1"
           @click="moveMenuItem('down')"
         >
-          <svg-icon name="south" />
-        </base-button>
+          <SouthIcon />
+        </BaseButton>
 
-        <base-button
+        <BaseButton
           variant="icon"
-          :title="$t('menus:delete')"
+          :title="$i18n.t('menus:delete')"
           @click="removeMenuItem"
         >
-          <svg-icon name="delete" />
-        </base-button>
+          <DeleteIcon />
+        </BaseButton>
       </div>
     </div>
 
@@ -64,58 +64,103 @@
       @submit.prevent="submitEditing"
     >
       <fieldset>
-        <form-field
+        <FormField
           :id="menuItem.id + '_label'"
-          v-model="itemDraft.label"
+          v-model:value="itemDraft.label"
           :name="menuItem.id + '_label'"
-          :label="$t('menus:name')"
+          :label="$i18n.t('menus:name')"
           autofocus
         />
-        <form-field
+        <FormField
           :id="menuItem.id + '_link'"
-          v-model="itemDraft.link"
+          v-model:value="itemDraft.link"
           :name="menuItem.id + '_link'"
-          :label="$t('menus:link')"
+          :label="$i18n.t('menus:link')"
         />
-        <form-field-checkbox
+        <FormFieldCheckbox
           :id="menuItem.id + '_isNewTab'"
-          v-model="itemDraft.isNewTab"
+          v-model:checked="itemDraft.isNewTab"
           :name="menuItem.id + '_isNewTab'"
-          :label="$t('menus:isNewTab')"
+          :label="$i18n.t('menus:isNewTab')"
         />
       </fieldset>
 
       <div class="form-bottom">
-        <base-button
+        <BaseButton
           variant="secondary"
-          :title="$t('menus:cancelChanges')"
+          :title="$i18n.t('menus:cancelChanges')"
           @click="cancelEditing"
         >
-          {{ $t('menus:cancel') }}
-        </base-button>
+          {{ $i18n.t("menus:cancel") }}
+        </BaseButton>
 
-        <base-button
+        <BaseButton
           variant="primary"
           type="submit"
-          :title="$t('menus:saveChanges')"
+          :title="$i18n.t('menus:saveChanges')"
         >
-          {{ $t('menus:save') }}
-        </base-button>
+          {{ $i18n.t("menus:save") }}
+        </BaseButton>
       </div>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { EditableMenuItemType } from '../MenuEditor.types';
-import { Nullable } from '@tager/admin-services';
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  type PropType,
+  ref,
+  watch,
+} from "vue";
 
-export default Vue.extend({
-  name: 'MenuItem',
+import type { Nullable } from "@tager/admin-services";
+import {
+  BaseButton,
+  FormField,
+  FormFieldCheckbox,
+  EditIcon,
+  NorthIcon,
+  SouthIcon,
+  DeleteIcon,
+  AddCircleIcon,
+} from "@tager/admin-ui";
+
+import type { EditableMenuItemType } from "../MenuEditor.types";
+
+interface MenuItemDraft {
+  label: string;
+  link: Nullable<string>;
+  isNewTab: boolean;
+}
+
+interface Props {
+  menuItem: EditableMenuItemType;
+  index: number;
+  indexPath: number[];
+  itemList: Array<EditableMenuItemType>;
+  isSupportsTree: boolean;
+}
+
+export default defineComponent({
+  name: "MenuItem",
+  components: {
+    BaseButton,
+    FormField,
+    FormFieldCheckbox,
+    EditIcon,
+    NorthIcon,
+    SouthIcon,
+    DeleteIcon,
+    AddCircleIcon,
+  },
   props: {
     menuItem: {
-      type: Object,
+      type: Object as PropType<Props["menuItem"]>,
       required: true,
     },
     index: {
@@ -123,11 +168,11 @@ export default Vue.extend({
       required: true,
     },
     indexPath: {
-      type: Array,
+      type: Array as PropType<Props["indexPath"]>,
       required: true,
     },
     itemList: {
-      type: Array,
+      type: Array as PropType<Props["itemList"]>,
       required: true,
     },
     isSupportsTree: {
@@ -135,99 +180,115 @@ export default Vue.extend({
       default: false,
     },
   },
-  data(): {
-    itemDraft: { label: string; link: string; isNewTab: boolean };
-  } {
-    return {
-      itemDraft: {
-        label: this.menuItem.label,
-        link: this.menuItem.link,
-        isNewTab: this.menuItem.isNewTab,
-      },
-    };
-  },
-  computed: {
-    isEditing(): boolean {
-      return ['EDITING', 'EDITING_NEW'].includes(this.menuItem.status);
-    },
-    labelPrefix(): string {
-      return (this.indexPath as Array<number>)
-        .map((itemIndex) => `${itemIndex + 1}.`)
-        .join('');
-    },
-  },
-  watch: {
-    isEditing(isEditing) {
-      if (!isEditing) return;
+  emits: [
+    "menu-item:update-status",
+    "menu-item:add-child",
+    "menu-item:remove",
+    "menu-item:move",
+    "menu-item:edit",
+  ],
+  setup(props: Props, context) {
+    const initialDraft = computed<MenuItemDraft>(() => ({
+      label: props.menuItem.label,
+      link: props.menuItem.link,
+      isNewTab: props.menuItem.isNewTab,
+    }));
 
-      Vue.nextTick(this.focusLabelInput);
-    },
-  },
-  mounted() {
-    if (this.isEditing) {
-      Vue.nextTick(this.focusLabelInput);
-    }
+    const itemDraft = ref<MenuItemDraft>({ ...initialDraft.value });
 
-    document.addEventListener('keydown', this.escapeListener);
-  },
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.escapeListener);
-  },
-  methods: {
-    focusLabelInput() {
+    const isEditing = computed(() => {
+      return ["EDITING", "EDITING_NEW"].includes(props.menuItem.status);
+    });
+
+    function focusLabelInput() {
       const inputElement = document.getElementById(
-        this.menuItem.id + '_label'
+        props.menuItem.id + "_label"
       ) as Nullable<HTMLInputElement>;
 
       if (inputElement) {
         inputElement.focus();
       }
-    },
-    escapeListener(event: KeyboardEvent) {
-      if (event.key === 'Escape' && this.isEditing) {
-        this.cancelEditing();
+    }
+
+    watch(isEditing, () => {
+      if (!isEditing.value) return;
+
+      nextTick(focusLabelInput);
+    });
+
+    function escapeListener(event: KeyboardEvent) {
+      if (event.key === "Escape" && isEditing.value) {
+        cancelEditing();
       }
-    },
-    getInitialDraft() {
-      return {
-        label: this.menuItem.label,
-        link: this.menuItem.link,
-        isNewTab: this.menuItem.isNewTab,
-      };
-    },
-    updateMenuItemStatus(status: EditableMenuItemType['status']) {
-      this.$emit('menu-item:update-status', {
-        itemId: this.menuItem.id,
+    }
+
+    onMounted(() => {
+      if (isEditing.value) {
+        nextTick(focusLabelInput);
+      }
+
+      document.addEventListener("keydown", escapeListener);
+    });
+
+    onBeforeUnmount(() => {
+      document.removeEventListener("keydown", escapeListener);
+    });
+
+    function updateMenuItemStatus(status: EditableMenuItemType["status"]) {
+      context.emit("menu-item:update-status", {
+        itemId: props.menuItem.id,
         payload: { status },
       });
-    },
-    startEditing() {
-      this.updateMenuItemStatus('EDITING');
-    },
-    cancelEditing() {
-      if (this.menuItem.status === 'EDITING_NEW') {
-        this.removeMenuItem();
+    }
+
+    function addChild() {
+      context.emit("menu-item:add-child", { itemId: props.menuItem.id });
+    }
+
+    function removeMenuItem() {
+      context.emit("menu-item:remove", { itemId: props.menuItem.id });
+    }
+
+    function moveMenuItem(direction: "up" | "down") {
+      context.emit("menu-item:move", { itemId: props.menuItem.id, direction });
+    }
+
+    function startEditing() {
+      updateMenuItemStatus("EDITING");
+    }
+
+    function cancelEditing() {
+      if (props.menuItem.status === "EDITING_NEW") {
+        removeMenuItem();
       } else {
-        this.itemDraft = this.getInitialDraft();
-        this.updateMenuItemStatus('IDLE');
+        itemDraft.value = { ...initialDraft.value };
+        updateMenuItemStatus("IDLE");
       }
-    },
-    submitEditing() {
-      this.$emit('menu-item:edit', {
-        itemId: this.menuItem.id,
-        payload: { ...this.itemDraft },
+    }
+
+    function submitEditing() {
+      context.emit("menu-item:edit", {
+        itemId: props.menuItem.id,
+        payload: { ...itemDraft.value },
       });
-      this.updateMenuItemStatus('IDLE');
-    },
-    addChild() {
-      this.$emit('menu-item:add-child', { itemId: this.menuItem.id });
-    },
-    removeMenuItem() {
-      this.$emit('menu-item:remove', { itemId: this.menuItem.id });
-    },
-    moveMenuItem(direction: 'up' | 'down') {
-      this.$emit('menu-item:move', { itemId: this.menuItem.id, direction });
-    },
+      updateMenuItemStatus("IDLE");
+    }
+
+    const labelPrefix = computed(() => {
+      return props.indexPath.map((itemIndex) => `${itemIndex + 1}.`).join("");
+    });
+
+    return {
+      itemDraft,
+      isEditing,
+      labelPrefix,
+      startEditing,
+      addChild,
+      moveMenuItem,
+      submitEditing,
+      removeMenuItem,
+      cancelEditing,
+    };
   },
 });
 </script>

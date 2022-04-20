@@ -1,8 +1,8 @@
-import { Nullable } from '@tager/admin-services';
+import type { Nullable } from "@tager/admin-services";
 
-import { MenuItemType } from '../../typings/model';
+import type { MenuItemType } from "../../typings/model";
 
-import { EditableMenuItemType } from './MenuEditor.types';
+import type { EditableMenuItemType } from "./MenuEditor.types";
 
 export function getItemCount(itemList: Array<EditableMenuItemType>): number {
   let sum = 0;
@@ -67,15 +67,15 @@ export function removeMenuItemById(
 export function moveMenuItemById(
   itemList: Array<EditableMenuItemType>,
   itemId: number,
-  direction: 'up' | 'down'
+  direction: "up" | "down"
 ): void {
   const itemIndex = itemList.findIndex((item) => item.id === itemId);
 
   if (itemIndex === -1) return;
 
   if (
-    (direction === 'up' && itemIndex === 0) ||
-    (direction === 'down' && itemIndex === itemList.length - 1)
+    (direction === "up" && itemIndex === 0) ||
+    (direction === "down" && itemIndex === itemList.length - 1)
   ) {
     return;
   }
@@ -83,7 +83,7 @@ export function moveMenuItemById(
   const item = itemList[itemIndex];
 
   itemList.splice(itemIndex, 1);
-  itemList.splice(direction === 'up' ? itemIndex - 1 : itemIndex + 1, 0, item);
+  itemList.splice(direction === "up" ? itemIndex - 1 : itemIndex + 1, 0, item);
 }
 
 export function convertToEditableMenuItems(
@@ -91,7 +91,7 @@ export function convertToEditableMenuItems(
 ): Array<EditableMenuItemType> {
   return menuItemList.map((item) => ({
     ...item,
-    status: 'IDLE',
+    status: "IDLE",
     children: convertToEditableMenuItems(item.children),
   }));
 }

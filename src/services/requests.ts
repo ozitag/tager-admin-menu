@@ -1,6 +1,6 @@
-import { request, ResponseBody } from '@tager/admin-services';
+import { request, type ResponseBody } from "@tager/admin-services";
 
-import { MenuItemType, MenuType } from '../typings/model';
+import type { MenuItemType, MenuType } from "../typings/model";
 
 export function getMenuByAlias(
   menuAlias: string

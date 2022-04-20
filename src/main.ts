@@ -1,35 +1,34 @@
-import { VueConstructor } from 'vue';
-import { CustomRouteConfig } from '@tager/admin-layout';
+import type { RouteRecordRaw } from "vue-router";
 
-import MenuEditorView from './views/MenuEditor';
-import { MENU_ROUTE_PATHS } from './constants/paths';
-import { i18n } from '@tager/admin-services';
-import EN from './locales/en';
-import RU from './locales/ru';
+import { MENU_ROUTE_PATHS } from "./constants/paths";
+import { applyTranslations } from "./locales/apply";
+import MenuEditor from "./views/MenuEditor";
 
-i18n.addTranslations('en', 'menus', EN);
-i18n.addTranslations('ru', 'menus', RU);
+applyTranslations();
 
-export * from './constants/routes';
-export * from './constants/paths';
-export * from './utils/paths';
+export * from "./constants/routes";
+export * from "./constants/paths";
+export * from "./utils/paths";
 
-export const MenuEditor: VueConstructor<Vue> = MenuEditorView;
+export { MenuEditor };
 
 export function createMenuRoute(
   name: string,
-  overrides?: Partial<CustomRouteConfig>
-): CustomRouteConfig {
-  return {
+  overrides?: Partial<RouteRecordRaw>
+): RouteRecordRaw {
+  const menuRoute: RouteRecordRaw = {
     name,
     path: MENU_ROUTE_PATHS.MENU_PAGE,
     component: MenuEditor,
     meta: {
       getBreadcrumbs: (route) => [
-        { url: '/', text: 'Home' },
+        { url: "/", text: "Home" },
         { url: route.path, text: name },
       ],
     },
-    ...overrides,
   };
+
+  Object.assign(menuRoute, overrides);
+
+  return menuRoute;
 }

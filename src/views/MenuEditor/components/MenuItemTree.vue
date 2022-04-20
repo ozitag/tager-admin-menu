@@ -1,12 +1,37 @@
+<template>
+  <ul class="menu-item-list">
+    <li
+      v-for="(menuItem, index) of menuItemList"
+      :key="menuItem.id"
+      class="menu-item-container"
+    >
+      <MenuItem
+        v-bind="$attrs"
+        :menu-item="menuItem"
+        :index="index"
+        :item-list="menuItemList"
+        :is-supports-tree="isSupportsTree"
+        :index-path="[...indexPath, index]"
+      />
+      <MenuItemTree
+        v-if="menuItem.children.length > 0"
+        v-bind="$attrs"
+        :menu-item-list="menuItem.children"
+        :index-path="[...indexPath, index]"
+      />
+    </li>
+  </ul>
+</template>
 <script lang="ts">
-import Vue, { VNode } from 'vue';
+import { defineComponent, type PropType } from "vue";
 
-import MenuItem from './MenuItem.vue';
-import { EditableMenuItemType } from '../MenuEditor.types';
+import type { EditableMenuItemType } from "../MenuEditor.types";
 
-export default Vue.extend({
-  name: 'MenuItemTree',
-  functional: true,
+import MenuItem from "./MenuItem.vue";
+
+export default defineComponent({
+  name: "MenuItemTree",
+  components: { MenuItem },
   props: {
     menuItemList: {
       type: Array as () => Array<EditableMenuItemType>,
@@ -16,45 +41,10 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-  },
-  render(createElement, context) {
-    const menuItemList = context.props.menuItemList;
-    const isSupportsTree = context.props.isSupportsTree;
-
-    function renderList(
-      itemList: Array<EditableMenuItemType>,
-      indexPath: Array<number>
-    ): VNode {
-      return createElement(
-        'ul',
-        { class: 'menu-item-list' },
-        itemList.map((menuItem, index) => {
-          const itemIndexPath = [...indexPath, index];
-
-          return createElement(
-            'li',
-            { class: 'menu-item-container', key: menuItem.id },
-            [
-              createElement(MenuItem, {
-                props: {
-                  menuItem,
-                  index,
-                  itemList,
-                  indexPath: itemIndexPath,
-                  isSupportsTree,
-                },
-                on: context.listeners,
-              }),
-              menuItem.children.length > 0
-                ? renderList(menuItem.children, itemIndexPath)
-                : null,
-            ]
-          );
-        })
-      );
-    }
-
-    return renderList(menuItemList, []);
+    indexPath: {
+      type: Array as PropType<number[]>,
+      default: () => [],
+    },
   },
 });
 </script>

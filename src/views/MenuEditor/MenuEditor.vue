@@ -1,5 +1,5 @@
 <template>
-  <page
+  <Page
     :title="pageTitle"
     :is-content-loading="isInitialLoading"
     :footer="{
@@ -8,11 +8,11 @@
     }"
   >
     <div v-if="itemCount >= 5" class="top-row">
-      <base-button variant="outline-primary" @click="addMenuItemToRootStart">
-        {{ $t('menus:addMenuItem') }}
-      </base-button>
+      <BaseButton variant="outline-primary" @click="addMenuItemToRootStart">
+        {{ $i18n.t("menus:addMenuItem") }}
+      </BaseButton>
     </div>
-    <menu-item-tree
+    <MenuItemTree
       v-if="menuItemList.length > 0"
       :menu-item-list="menuItemList"
       :is-supports-tree="isSupportsTree"
@@ -23,24 +23,39 @@
       @menu-item:move="handleMenuItemMove"
     />
     <div class="bottom-row">
-      <base-button variant="outline-primary" @click="addMenuItemToRootEnd">
-        {{ $t('menus:addMenuItem') }}
-      </base-button>
+      <BaseButton variant="outline-primary" @click="addMenuItemToRootEnd">
+        {{ $i18n.t("menus:addMenuItem") }}
+      </BaseButton>
     </div>
-  </page>
+  </Page>
 </template>
 
 <script lang="ts">
 import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  type SetupContext,
+  watch,
+} from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+import {
   convertRequestErrorToMap,
-  Nullable,
+  type Nullable,
   useResource,
-} from '@tager/admin-services';
+  useI18n,
+  useToast,
+} from "@tager/admin-services";
+import { BaseButton } from "@tager/admin-ui";
+import { Page } from "@tager/admin-layout";
 
-import { getMenuByAlias, updateMenuItemList } from '../../services/requests';
+import { getMenuByAlias, updateMenuItemList } from "../../services/requests";
+import type { MenuType } from "../../typings/model";
 
-import MenuItemTree from './components/MenuItemTree.vue';
-import { EditableMenuItemType } from './MenuEditor.types';
+import MenuItemTree from "./components/MenuItemTree.vue";
+import type { EditableMenuItemType } from "./MenuEditor.types";
 import {
   convertToEditableMenuItems,
   findArrayContainingMenuItemWithId,
@@ -48,41 +63,31 @@ import {
   getItemCount,
   moveMenuItemById,
   removeMenuItemById,
-} from './MenuEditor.helpers';
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  ref,
-  SetupContext,
-  watch,
-} from '@vue/composition-api';
-import { MenuType } from '../../typings/model';
-import { useTranslation } from '@tager/admin-ui';
+} from "./MenuEditor.helpers";
 
 export default defineComponent({
-  name: 'MenuEditor',
-  components: { MenuItemTree },
-  setup(props, context: SetupContext) {
-    const { t } = useTranslation(context);
+  name: "MenuEditor",
+  components: { BaseButton, MenuItemTree, Page },
+  setup(props) {
+    const i18n = useI18n();
+    const router = useRouter();
+    const route = useRoute();
+    const toast = useToast();
 
-    const menuAlias = computed<string>(
-      () => context.root.$route.params.menuAlias
-    );
+    const menuAlias = computed(() => route.params.menuAlias as string);
 
     const [fetchMenu, { data: menu, loading }] = useResource<
       Nullable<MenuType>
     >({
       fetchResource: () => getMenuByAlias(menuAlias.value),
       initialValue: null,
-      context,
-      resourceName: 'Menu',
+      resourceName: "Menu",
     });
 
     const pageTitle = computed<string>(() =>
       menu.value
-        ? `${menu.value.name} - ${t('menus:menuItems')}`
-        : t('menus:menuItems')
+        ? `${menu.value.name} - ${i18n.t("menus:menuItems")}`
+        : i18n.t("menus:menuItems")
     );
 
     onMounted(() => {
@@ -100,7 +105,7 @@ export default defineComponent({
       fetchMenu();
     });
 
-    const itemCount = computed<number>(() => getItemCount(menuItemList.value));
+    const itemCount = computed(() => getItemCount(menuItemList.value));
 
     function handleMenuItemEdit(event: {
       itemId: number;
@@ -108,6 +113,7 @@ export default defineComponent({
     }) {
       const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
+      console.log("foundItem", foundItem);
       if (foundItem) {
         foundItem.label = event.payload.label;
         foundItem.link = event.payload.link;
@@ -117,7 +123,7 @@ export default defineComponent({
 
     function handleMenuItemStatusUpdate(event: {
       itemId: number;
-      payload: { status: EditableMenuItemType['status'] };
+      payload: { status: EditableMenuItemType["status"] };
     }) {
       const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
@@ -129,10 +135,10 @@ export default defineComponent({
     function createNewMenuItem(): EditableMenuItemType {
       return {
         id: Math.round(Math.random() * 1000000),
-        label: '',
-        link: '',
+        label: "",
+        link: "",
         isNewTab: false,
-        status: 'EDITING_NEW',
+        status: "EDITING_NEW",
         children: [],
       };
     }
@@ -159,7 +165,7 @@ export default defineComponent({
 
     function handleMenuItemMove(event: {
       itemId: number;
-      direction: 'up' | 'down';
+      direction: "up" | "down";
     }) {
       const childList = findArrayContainingMenuItemWithId(
         menuItemList.value,
@@ -182,22 +188,22 @@ export default defineComponent({
           errors.value = {};
 
           if (shouldExit) {
-            context.root.$router.push('/');
+            router.push("/");
           }
 
-          context.root.$toast({
-            variant: 'success',
-            title: t('menus:success'),
-            body: t('menus:settingsHaveBeenSuccessfullyUpdated'),
+          toast.show({
+            variant: "success",
+            title: i18n.t("menus:success"),
+            body: i18n.t("menus:settingsHaveBeenSuccessfullyUpdated"),
           });
         })
         .catch((error) => {
           console.error(error);
           errors.value = convertRequestErrorToMap(error);
-          context.root.$toast({
-            variant: 'danger',
-            title: t('menus:error'),
-            body: t('menus:settingsUpdateHaveBeenFailed'),
+          toast.show({
+            variant: "danger",
+            title: i18n.t("menus:error"),
+            body: i18n.t("menus:settingsUpdateHaveBeenFailed"),
           });
         })
         .finally(() => {
@@ -206,9 +212,8 @@ export default defineComponent({
     }
 
     return {
-      t,
       menuItemList,
-      errors: {},
+      errors,
       isSubmitting,
       isInitialLoading: loading,
       isSupportsTree,
