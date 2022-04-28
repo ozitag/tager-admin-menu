@@ -1,10 +1,9 @@
 import { createApp } from "vue";
 
 import { configStore, i18n, i18nPlugin } from "@tager/admin-services";
+import { createRouter } from "@tager/admin-layout";
 import "@tager/admin-ui/css";
 import "@tager/admin-layout/css";
-
-import { createRouter } from "@tager/admin-layout";
 
 import { applyTranslations } from "../locales/apply";
 import { MENU_PAGE_ROUTE } from "../constants/routes";
