@@ -16,6 +16,7 @@
       <MenuItemTree
         v-if="menuItem.children.length > 0"
         v-bind="$attrs"
+        :is-supports-tree="isSupportsTree"
         :menu-item-list="menuItem.children"
         :index-path="[...indexPath, index]"
       />

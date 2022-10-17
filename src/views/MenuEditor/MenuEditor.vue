@@ -37,7 +37,7 @@ import {
   onMounted,
   ref,
   type SetupContext,
-  watch,
+  watch
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -46,9 +46,9 @@ import {
   type Nullable,
   useResource,
   useI18n,
-  useToast,
+  useToast
 } from "@tager/admin-services";
-import { BaseButton } from "@tager/admin-ui";
+import { BaseButton, TagerFormSubmitEvent } from "@tager/admin-ui";
 import { Page } from "@tager/admin-layout";
 
 import { getMenuByAlias, updateMenuItemList } from "../../services/requests";
@@ -62,7 +62,7 @@ import {
   findMenuItemById,
   getItemCount,
   moveMenuItemById,
-  removeMenuItemById,
+  removeMenuItemById
 } from "./MenuEditor.helpers";
 
 export default defineComponent({
@@ -76,12 +76,10 @@ export default defineComponent({
 
     const menuAlias = computed(() => route.params.menuAlias as string);
 
-    const [fetchMenu, { data: menu, loading }] = useResource<
-      Nullable<MenuType>
-    >({
+    const [fetchMenu, { data: menu, loading }] = useResource<Nullable<MenuType>>({
       fetchResource: () => getMenuByAlias(menuAlias.value),
       initialValue: null,
-      resourceName: "Menu",
+      resourceName: "Menu"
     });
 
     const pageTitle = computed<string>(() =>
@@ -139,7 +137,7 @@ export default defineComponent({
         link: "",
         isNewTab: false,
         status: "EDITING_NEW",
-        children: [],
+        children: []
       };
     }
 
@@ -180,21 +178,21 @@ export default defineComponent({
     const isSubmitting = ref<boolean>(false);
     const errors = ref<Record<string, string>>({});
 
-    function submitForm({ shouldExit }: { shouldExit: boolean }) {
+    function submitForm({ type }: TagerFormSubmitEvent) {
       isSubmitting.value = true;
 
       updateMenuItemList(menuAlias.value, menuItemList.value)
         .then(() => {
           errors.value = {};
 
-          if (shouldExit) {
+          if (type === "save_exit") {
             router.push("/");
           }
 
           toast.show({
             variant: "success",
             title: i18n.t("menus:success"),
-            body: i18n.t("menus:settingsHaveBeenSuccessfullyUpdated"),
+            body: i18n.t("menus:settingsHaveBeenSuccessfullyUpdated")
           });
         })
         .catch((error) => {
@@ -203,7 +201,7 @@ export default defineComponent({
           toast.show({
             variant: "danger",
             title: i18n.t("menus:error"),
-            body: i18n.t("menus:settingsUpdateHaveBeenFailed"),
+            body: i18n.t("menus:settingsUpdateHaveBeenFailed")
           });
         })
         .finally(() => {
@@ -226,9 +224,9 @@ export default defineComponent({
       handleMenuItemMove,
       handleMenuItemEdit,
       handleMenuItemStatusUpdate,
-      submitForm,
+      submitForm
     };
-  },
+  }
 });
 </script>
 
@@ -236,6 +234,7 @@ export default defineComponent({
 .top-row {
   margin-bottom: 1rem;
 }
+
 .bottom-row {
   margin-top: 1rem;
 }

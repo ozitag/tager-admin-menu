@@ -26,12 +26,8 @@ export default defineComponent({
         icon: SettingsIcon,
         children: [
           {
-            text: "main_en",
-            url: getMenuPageUrl({ menuAlias: "main_en" }),
-          },
-          {
-            text: "main_ru",
-            url: getMenuPageUrl({ menuAlias: "main_ru" }),
+            text: "header",
+            url: getMenuPageUrl({ menuAlias: "header" }),
           },
         ],
       },
