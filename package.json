@@ -1,6 +1,6 @@
 {
   "name": "@tager/admin-menus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "exports": {
     "./css": "./dist/style.css",
@@ -44,6 +44,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.7.1",
+    "pinia": "^2.0.27",
     "sass": "^1.51.0",
     "sass-loader": "^12.6.0",
     "typescript": "^4.6.3",

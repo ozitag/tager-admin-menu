@@ -100,7 +100,7 @@ export default defineComponent({
     });
 
     watch(menuAlias, () => {
-      if (menuAlias) {
+      if (menuAlias.value) {
         fetchMenu();
       }
     });
@@ -113,7 +113,6 @@ export default defineComponent({
     }) {
       const foundItem = findMenuItemById(menuItemList.value, event.itemId);
 
-      console.log("foundItem", foundItem);
       if (foundItem) {
         foundItem.label = event.payload.label;
         foundItem.link = event.payload.link;
