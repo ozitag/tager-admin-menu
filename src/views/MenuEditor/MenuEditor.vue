@@ -68,7 +68,7 @@ import {
 export default defineComponent({
   name: "MenuEditor",
   components: { BaseButton, MenuItemTree, Page },
-  setup(props) {
+  setup() {
     const i18n = useI18n();
     const router = useRouter();
     const route = useRoute();
@@ -100,7 +100,9 @@ export default defineComponent({
     });
 
     watch(menuAlias, () => {
-      fetchMenu();
+      if (menuAlias) {
+        fetchMenu();
+      }
     });
 
     const itemCount = computed(() => getItemCount(menuItemList.value));
