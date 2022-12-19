@@ -12,6 +12,18 @@ export * from "./utils/paths";
 
 export { MenuEditor };
 
+export const MENU_EDITOR_ROUTE: RouteRecordRaw = {
+  path: MENU_ROUTE_PATHS.MENU_PAGE,
+  component: MenuEditor,
+  name: "Menu Editor",
+  meta: {
+    getBreadcrumbs: (route, i18n) => [
+      { url: "/", text: i18n.t("menus:home") },
+      { url: route.path, text: i18n.t("menus:menuEditor") },
+    ],
+  },
+};
+
 export function createMenuRoute(
   name: string,
   overrides?: Partial<RouteRecordRaw>

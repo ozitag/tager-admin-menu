@@ -27,4 +27,6 @@ export const EN = {
   headerMenu: "Top Menu",
   mainMenu: "Main menu",
   footerMenu: "Lower menu",
+
+  menuEditor: "Menu Editor",
 };

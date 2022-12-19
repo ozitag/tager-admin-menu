@@ -28,4 +28,6 @@ export const RU: typeof EN = {
   headerMenu: "Верхнее меню",
   mainMenu: "Главное меню",
   footerMenu: "Нижнее меню",
+
+  menuEditor: "Редактор меню",
 };
